@@ -3,6 +3,10 @@
 DOTFILES_CONFIG_HOME="${DOTFILES_CONFIG_HOME:-$HOME/.config/dotfiles}"
 export DOTFILES_CONFIG_HOME
 
+if [ -n "${SSH_TTY:-}" ] && [ "${TERM:-}" = "dumb" ]; then
+  export TERM="xterm-256color"
+fi
+
 # shellcheck source=/dev/null
 [ -f "$HOME/.local/bin/env" ] && . "$HOME/.local/bin/env"
 
