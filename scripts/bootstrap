@@ -117,12 +117,12 @@ install_lazygit_linux() {
   fi
 
   tmpdir="$(mktemp -d)"
-  trap 'rm -rf "$tmpdir"' RETURN
   curl -fsSL \
     "https://github.com/jesseduffield/lazygit/releases/download/v${version}/lazygit_${version}_Linux_${lazygit_arch}.tar.gz" \
     -o "$tmpdir/lazygit.tar.gz"
   tar -xzf "$tmpdir/lazygit.tar.gz" -C "$tmpdir" lazygit
   as_root install -m 0755 "$tmpdir/lazygit" /usr/local/bin/lazygit
+  rm -rf "$tmpdir"
 }
 
 clone_omz_plugin() {
