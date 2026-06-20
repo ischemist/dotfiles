@@ -1,0 +1,7 @@
+.DS_Store
+*.local
+*.secret
+*.agekey
+chezmoi.toml
+chezmoi.toml.bak
+*.log
