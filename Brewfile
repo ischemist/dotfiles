@@ -1,5 +1,3 @@
-tap "jdx/mise"
-
 brew "autossh"
 brew "bat"
 brew "btop"
