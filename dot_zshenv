@@ -1,0 +1,3 @@
+if [ -d "$HOME/.n/bin" ]; then
+  export PATH="$HOME/.n/bin:$PATH"
+fi

@@ -1,0 +1,7 @@
+id: no-hardcoded-macos-home
+language: Bash
+severity: warning
+message: use $HOME or a chezmoi template instead of hardcoding this machine home path
+rule:
+  kind: program
+  regex: /Users/morgunov

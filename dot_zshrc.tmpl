@@ -1,0 +1,17 @@
+export ZSH="$HOME/.oh-my-zsh"
+ZSH_THEME=""
+ENABLE_CORRECTION="true"
+
+plugins=(git zsh-autosuggestions zsh-syntax-highlighting)
+
+if [ -f "$ZSH/oh-my-zsh.sh" ]; then
+  source "$ZSH/oh-my-zsh.sh"
+fi
+
+if [ -f "$HOME/.config/dotfiles/shell/common.sh" ]; then
+  source "$HOME/.config/dotfiles/shell/common.sh"
+fi
+
+if [ -f "$HOME/.config/dotfiles/shell/zsh.zsh" ]; then
+  source "$HOME/.config/dotfiles/shell/zsh.zsh"
+fi

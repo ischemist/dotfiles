@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+os="$(uname -s)"
+
+install_macos() {
+  if ! command -v brew >/dev/null 2>&1; then
+    echo "homebrew is required before bootstrap can continue" >&2
+    echo "install from https://brew.sh, then rerun this script" >&2
+    return 1
+  fi
+
+  brew bundle --file "$repo_root/Brewfile"
+
+  if [ ! -d "$HOME/.oh-my-zsh" ]; then
+    RUNZSH=no CHSH=no KEEP_ZSHRC=yes sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
+  fi
+
+  clone_omz_plugin zsh-autosuggestions https://github.com/zsh-users/zsh-autosuggestions.git
+  clone_omz_plugin zsh-syntax-highlighting https://github.com/zsh-users/zsh-syntax-highlighting.git
+}
+
+install_ubuntu() {
+  sudo apt-get update
+
+  local available=()
+  local missing=()
+  local package
+
+  while IFS= read -r package; do
+    [ -z "$package" ] && continue
+    if apt-cache show "$package" >/dev/null 2>&1; then
+      available+=("$package")
+    else
+      missing+=("$package")
+    fi
+  done < "$repo_root/packages/ubuntu.txt"
+
+  if [ "${#available[@]}" -gt 0 ]; then
+    sudo apt-get install -y "${available[@]}"
+  fi
+
+  if [ "${#missing[@]}" -gt 0 ]; then
+    printf 'not available from this apt repo:\n' >&2
+    printf '  %s\n' "${missing[@]}" >&2
+    printf 'install these via homebrew/linuxbrew, cargo, or upstream installers.\n' >&2
+  fi
+}
+
+clone_omz_plugin() {
+  local name="$1"
+  local url="$2"
+  local dest="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/plugins/$name"
+
+  if [ ! -d "$dest/.git" ]; then
+    git clone --depth 1 "$url" "$dest"
+  fi
+}
+
+case "$os" in
+  Darwin) install_macos ;;
+  Linux)
+    if command -v apt-get >/dev/null 2>&1; then
+      install_ubuntu
+    else
+      echo "unsupported linux package manager; install packages manually from packages/ubuntu.txt" >&2
+      exit 1
+    fi
+    ;;
+  *)
+    echo "unsupported os: $os" >&2
+    exit 1
+    ;;
+esac
+
+echo "bootstrap complete"

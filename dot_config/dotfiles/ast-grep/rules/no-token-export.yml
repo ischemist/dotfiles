@@ -1,0 +1,7 @@
+id: no-token-export
+language: Bash
+severity: error
+message: do not export token-like secrets from managed shell files
+rule:
+  kind: program
+  regex: 'export [A-Z0-9_]*(TOKEN|SECRET|PASSWORD|KEY)[A-Z0-9_]*='

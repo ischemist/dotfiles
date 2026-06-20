@@ -1,0 +1,73 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+cd "$repo_root"
+
+failures=0
+
+run_check() {
+  local name="$1"
+  shift
+
+  printf '==> %s\n' "$name"
+  if ! "$@"; then
+    failures=$((failures + 1))
+  fi
+}
+
+check_chezmoi_source() {
+  chezmoi --source "$repo_root" data >/dev/null
+}
+
+run_check "bash syntax" bash -n \
+  scripts/bootstrap \
+  scripts/doctor \
+  scripts/audit-secrets \
+  dot_config/dotfiles/shell/common.sh \
+  dot_config/dotfiles/shell/path.sh \
+  dot_config/dotfiles/shell/aliases.sh \
+  dot_config/dotfiles/shell/functions.sh \
+  dot_config/dotfiles/shell/bash.sh \
+  dot_bashrc \
+  dot_profile
+
+run_check "zsh syntax" zsh -n \
+  dot_zshrc.tmpl \
+  dot_zprofile.tmpl \
+  dot_zshenv \
+  dot_config/dotfiles/shell/zsh.zsh \
+  dot_oh-my-zsh/custom/themes/morgunov.zsh-theme
+
+if command -v shellcheck >/dev/null 2>&1; then
+  run_check "shellcheck" shellcheck \
+    scripts/bootstrap \
+    scripts/doctor \
+    scripts/audit-secrets \
+    dot_config/dotfiles/shell/*.sh \
+    dot_bashrc \
+    dot_profile
+else
+  printf '==> shellcheck skipped: not installed\n'
+fi
+
+if command -v sg >/dev/null 2>&1; then
+  run_check "ast-grep" sg scan --config sgconfig.yml --report-style short .
+else
+  printf '==> ast-grep skipped: not installed\n'
+fi
+
+if command -v chezmoi >/dev/null 2>&1; then
+  run_check "chezmoi source parse" check_chezmoi_source
+else
+  printf '==> chezmoi skipped: not installed\n'
+fi
+
+run_check "secret audit" scripts/audit-secrets
+
+if [ "$failures" -gt 0 ]; then
+  printf '%s\n' "$failures check(s) failed" >&2
+  exit 1
+fi
+
+printf '%s\n' "all checks passed"

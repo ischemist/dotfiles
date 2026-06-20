@@ -1,0 +1,7 @@
+theme = dark:Catppuccin Mocha,light:Catppuccin Latte
+
+font-family = "Geist Mono"
+copy-on-select = "clipboard"
+macos-titlebar-style = tabs
+background-opacity = 0.95
+auto-update-channel = tip

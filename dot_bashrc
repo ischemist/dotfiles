@@ -1,0 +1,10 @@
+# shellcheck shell=bash
+# shellcheck source=/dev/null
+if [ -f "$HOME/.config/dotfiles/shell/common.sh" ]; then
+  . "$HOME/.config/dotfiles/shell/common.sh"
+fi
+
+# shellcheck source=/dev/null
+if [ -f "$HOME/.config/dotfiles/shell/bash.sh" ]; then
+  . "$HOME/.config/dotfiles/shell/bash.sh"
+fi

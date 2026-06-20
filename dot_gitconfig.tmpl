@@ -1,0 +1,35 @@
+[user]
+	name = Anton Morgunov
+	email = anton@ischemist.com
+	signingkey = {{ .chezmoi.homeDir }}/.ssh/github/sign-primary-notouch.pub
+[gpg]
+	format = ssh
+[gpg "ssh"]
+	program = {{ if eq .chezmoi.os "darwin" }}/opt/homebrew/bin/ssh-keygen{{ else }}ssh-keygen{{ end }}
+	allowedSignersFile = {{ .chezmoi.homeDir }}/.config/git/allowed_signers
+[filter "lfs"]
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
+	process = git-lfs filter-process
+	required = true
+[init]
+	defaultBranch = master
+[commit]
+	gpgsign = true
+[core]
+	excludesfile = {{ .chezmoi.homeDir }}/.config/git/ignore
+	pager = delta
+[interactive]
+	diffFilter = delta --color-only
+[delta]
+	navigate = true
+	side-by-side = true
+	line-numbers = true
+[merge]
+	conflictstyle = zdiff3
+[credential "https://github.com"]
+	helper =
+	helper = !{{ if eq .chezmoi.os "darwin" }}/opt/homebrew/bin/{{ end }}gh auth git-credential
+[credential "https://gist.github.com"]
+	helper =
+	helper = !{{ if eq .chezmoi.os "darwin" }}/opt/homebrew/bin/{{ end }}gh auth git-credential

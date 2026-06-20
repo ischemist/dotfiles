@@ -178,6 +178,21 @@ the optional argument seeds the fzf query; press enter to accept the selected di
 
 git config uses ssh signing and delta.
 
+ssh commit signing uses yubikey-backed `ed25519-sk` keys:
+
+```ini
+[user]
+  signingkey = ~/.ssh/github/sign-primary-notouch.pub
+[gpg]
+  format = ssh
+[gpg "ssh"]
+  allowedSignersFile = ~/.config/git/allowed_signers
+[commit]
+  gpgsign = true
+```
+
+the signing keys are no-touch keys. this is intentional for commit signing only: the yubikey must still be present, but commits do not require a pin or touch prompt. do not reuse this policy for ssh auth keys.
+
 delta is the git pager:
 
 ```ini

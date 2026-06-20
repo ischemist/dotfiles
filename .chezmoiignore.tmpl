@@ -1,0 +1,13 @@
+.git/
+.gitignore
+README.md
+Brewfile
+sgconfig.yml
+packages/
+scripts/
+ast-grep/
+
+{{ if ne .chezmoi.os "darwin" -}}
+Library/
+dot_oh-my-zsh/
+{{ end -}}
