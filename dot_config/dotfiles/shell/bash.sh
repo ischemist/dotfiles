@@ -26,10 +26,10 @@ if command -v fzf >/dev/null 2>&1; then
   unset fzf_base
 fi
 
-if command -v atuin >/dev/null 2>&1; then
-  eval "$(atuin init bash)"
-fi
-
 if [ "${TERM:-}" != "dumb" ] && command -v starship >/dev/null 2>&1; then
   eval "$(starship init bash)"
+fi
+
+if command -v atuin >/dev/null 2>&1; then
+  eval "$(atuin init bash)"
 fi
