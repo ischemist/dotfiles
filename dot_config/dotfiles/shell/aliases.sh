@@ -18,6 +18,7 @@ fi
 if ! command -v bat >/dev/null 2>&1 && command -v batcat >/dev/null 2>&1; then
   alias bat='batcat'
 fi
+alias ghostty-terminfo-install='ghostty_terminfo_install'
 alias ..='cd ..'
 alias ...='cd ../..'
 alias sg-dotfiles='sg_dotfiles'

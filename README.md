@@ -334,6 +334,18 @@ ghostty config is managed on macos:
 
 the managed config keeps the actual settings and drops the generated comments.
 
+ghostty ssh integration is enabled:
+
+```text
+shell-integration-features = sudo,ssh-env,ssh-terminfo
+```
+
+this lets ghostty wrap interactive `ssh` calls and install `xterm-ghostty` terminfo on the remote host when possible. for cases the wrapper cannot cover, install manually:
+
+```sh
+ghostty-terminfo-install icgroup
+```
+
 ## packages
 
 macos packages:

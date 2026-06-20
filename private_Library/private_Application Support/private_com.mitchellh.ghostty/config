@@ -5,3 +5,4 @@ copy-on-select = "clipboard"
 macos-titlebar-style = tabs
 background-opacity = 0.95
 auto-update-channel = tip
+shell-integration-features = sudo,ssh-env,ssh-terminfo

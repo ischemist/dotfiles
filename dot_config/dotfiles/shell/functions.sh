@@ -16,6 +16,26 @@ tunnel() {
     "$@"
 }
 
+ghostty_terminfo_source() {
+  if [ -d "/Applications/Ghostty.app/Contents/Resources/terminfo" ]; then
+    TERMINFO="/Applications/Ghostty.app/Contents/Resources/terminfo" infocmp -x xterm-ghostty
+  elif has infocmp; then
+    infocmp -x xterm-ghostty
+  else
+    printf '%s\n' "infocmp is not installed" >&2
+    return 127
+  fi
+}
+
+ghostty_terminfo_install() {
+  if [ "$#" -lt 1 ]; then
+    printf '%s\n' "usage: ghostty_terminfo_install <ssh-host>" >&2
+    return 2
+  fi
+
+  ghostty_terminfo_source | ssh "$@" 'mkdir -p "$HOME/.terminfo" && tic -x -'
+}
+
 mkcd() {
   mkdir -p "$1" && cd "$1" || return
 }
