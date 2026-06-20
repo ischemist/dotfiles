@@ -4,7 +4,20 @@ set -euo pipefail
 repo_root="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 os="$(uname -s)"
 
+as_root() {
+  if [ "$(id -u)" -eq 0 ]; then
+    "$@"
+  elif command -v sudo >/dev/null 2>&1; then
+    sudo "$@"
+  else
+    echo "sudo is required for: $*" >&2
+    return 1
+  fi
+}
+
 install_macos() {
+  install_direct_tools
+
   if ! command -v brew >/dev/null 2>&1; then
     echo "homebrew is required before bootstrap can continue" >&2
     echo "install from https://brew.sh, then rerun this script" >&2
@@ -22,30 +35,94 @@ install_macos() {
 }
 
 install_ubuntu() {
-  sudo apt-get update
+  install_direct_tools
+
+  as_root apt-get update
 
   local available=()
-  local missing=()
   local package
 
   while IFS= read -r package; do
     [ -z "$package" ] && continue
     if apt-cache show "$package" >/dev/null 2>&1; then
       available+=("$package")
-    else
-      missing+=("$package")
     fi
   done < "$repo_root/packages/ubuntu.txt"
 
   if [ "${#available[@]}" -gt 0 ]; then
-    sudo apt-get install -y "${available[@]}"
+    as_root apt-get install -y "${available[@]}"
+  fi
+  if ! command -v lazygit >/dev/null 2>&1; then
+    install_lazygit_linux
+  fi
+}
+
+install_direct_tools() {
+  mkdir -p "$HOME/.local/bin"
+  export PATH="$HOME/.local/bin:$HOME/.atuin/bin:$PATH"
+
+  if ! command -v chezmoi >/dev/null 2>&1; then
+    sh -c "$(curl -fsLS get.chezmoi.io)" -- -b "$HOME/.local/bin"
   fi
 
-  if [ "${#missing[@]}" -gt 0 ]; then
-    printf 'not available from this apt repo:\n' >&2
-    printf '  %s\n' "${missing[@]}" >&2
-    printf 'install these via homebrew/linuxbrew, cargo, or upstream installers.\n' >&2
+  if ! command -v uv >/dev/null 2>&1; then
+    curl -LsSf https://astral.sh/uv/install.sh | sh
   fi
+
+  if ! command -v atuin >/dev/null 2>&1; then
+    curl --proto '=https' --tlsv1.2 -LsSf https://setup.atuin.sh | sh
+  fi
+
+  if ! command -v starship >/dev/null 2>&1; then
+    curl -sS https://starship.rs/install.sh | env BIN_DIR="$HOME/.local/bin" sh -s -- --yes
+  fi
+
+  if ! command -v mise >/dev/null 2>&1; then
+    curl https://mise.run | sh
+  fi
+
+  if ! command -v zoxide >/dev/null 2>&1; then
+    curl -sSfL https://raw.githubusercontent.com/ajeetdsouza/zoxide/main/install.sh | sh
+  fi
+
+  if ! command -v ast-grep >/dev/null 2>&1; then
+    if command -v uv >/dev/null 2>&1; then
+      uv tool install ast-grep-cli
+    else
+      echo "uv is required to install ast-grep-cli" >&2
+    fi
+  fi
+}
+
+install_lazygit_linux() {
+  local arch
+  local lazygit_arch
+  local tmpdir
+  local version
+
+  arch="$(uname -m)"
+  case "$arch" in
+    x86_64 | amd64) lazygit_arch="x86_64" ;;
+    aarch64 | arm64) lazygit_arch="arm64" ;;
+    *)
+      echo "unsupported lazygit arch: $arch" >&2
+      return 0
+      ;;
+  esac
+
+  version="$(curl -fsSL https://api.github.com/repos/jesseduffield/lazygit/releases/latest | sed -n 's/.*"tag_name": "v\([^"]*\)".*/\1/p' | head -n 1)"
+  if [ -z "$version" ]; then
+    echo "could not determine latest lazygit version" >&2
+    return 0
+  fi
+
+  tmpdir="$(mktemp -d)"
+  trap 'rm -rf "$tmpdir"' RETURN
+  curl -fsSL \
+    "https://github.com/jesseduffield/lazygit/releases/download/v${version}/lazygit_${version}_Linux_${lazygit_arch}.tar.gz" \
+    -o "$tmpdir/lazygit.tar.gz"
+  tar -xzf "$tmpdir/lazygit.tar.gz" -C "$tmpdir" lazygit
+  as_root install -m 0755 "$tmpdir/lazygit" /usr/local/bin/lazygit
 }
 
 clone_omz_plugin() {

@@ -1,9 +1,6 @@
-ast-grep
-atuin
 autossh
 bat
 btop
-chezmoi
 direnv
 eza
 fd-find
@@ -11,12 +8,8 @@ fzf
 git
 git-delta
 jq
-lazygit
 ncdu
 ripgrep
 shellcheck
-starship
-uv
 yq
-zoxide
 zsh

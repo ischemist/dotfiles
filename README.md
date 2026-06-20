@@ -45,6 +45,14 @@ chezmoi cd
 chezmoi apply
 ```
 
+dependency policy lives in:
+
+```text
+docs/dependencies.md
+```
+
+the short version: use direct upstream installers when the tool has a good one, and use brew/apt only for boring system packages or tools whose direct story is worse.
+
 ## shell layout
 
 entrypoints:
