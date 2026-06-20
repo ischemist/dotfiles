@@ -15,6 +15,8 @@ path_append() {
 }
 
 [ -d "$HOME/.local/bin" ] && path_prepend "$HOME/.local/bin"
+[ -d "$HOME/bin" ] && path_prepend "$HOME/bin"
+[ -d "$HOME/.atuin/bin" ] && path_prepend "$HOME/.atuin/bin"
 [ -d "$HOME/.n/bin" ] && path_prepend "$HOME/.n/bin"
 [ -d "$HOME/.bun/bin" ] && path_prepend "$HOME/.bun/bin"
 [ -d "$HOME/.opencode/bin" ] && path_prepend "$HOME/.opencode/bin"
