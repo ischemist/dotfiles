@@ -1,7 +1,10 @@
+{{- $signingKey := joinPath .chezmoi.homeDir ".ssh/github/sign-primary-notouch.pub" -}}
 [user]
 	name = Anton Morgunov
 	email = anton@ischemist.com
-	signingkey = {{ .chezmoi.homeDir }}/.ssh/github/sign-primary-notouch.pub
+{{- if stat $signingKey }}
+	signingkey = {{ $signingKey }}
+{{- end }}
 [gpg]
 	format = ssh
 [gpg "ssh"]
@@ -14,8 +17,10 @@
 	required = true
 [init]
 	defaultBranch = master
+{{- if stat $signingKey }}
 [commit]
 	gpgsign = true
+{{- end }}
 [core]
 	excludesfile = {{ .chezmoi.homeDir }}/.config/git/ignore
 	pager = delta

@@ -12,6 +12,9 @@ fi
 
 alias grep='grep --color=auto'
 alias lg='lazygit'
+if ! command -v fd >/dev/null 2>&1 && command -v fdfind >/dev/null 2>&1; then
+  alias fd='fdfind'
+fi
 alias ..='cd ..'
 alias ...='cd ../..'
 alias sg-dotfiles='sg_dotfiles'

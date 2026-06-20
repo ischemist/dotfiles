@@ -20,14 +20,20 @@ mkcd() {
   mkdir -p "$1" && cd "$1" || return
 }
 
-cdd() {
-  # shellcheck disable=SC3043
-  local cdd_dir cdd_query
-
-  if ! has fd; then
+fd_find() {
+  if has fd; then
+    fd "$@"
+  elif has fdfind; then
+    fdfind "$@"
+  else
     printf '%s\n' "fd is not installed" >&2
     return 127
   fi
+}
+
+cdd() {
+  # shellcheck disable=SC3043
+  local cdd_dir cdd_query
 
   if ! has fzf; then
     printf '%s\n' "fzf is not installed" >&2
@@ -35,7 +41,7 @@ cdd() {
   fi
 
   cdd_query="$*"
-  cdd_dir=$(fd -t d . | fzf --query "$cdd_query") || return
+  cdd_dir=$(fd_find -t d . | fzf --query "$cdd_query") || return
   [ -n "$cdd_dir" ] || return
   cd "$cdd_dir" || return
 }

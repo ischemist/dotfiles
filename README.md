@@ -36,10 +36,13 @@ chezmoi diff
 chezmoi apply
 ```
 
-fresh-machine shape, once this repo is remote:
+fresh-machine shape:
 
 ```sh
-sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply morgunov/dotfiles
+sh -c "$(curl -fsLS get.chezmoi.io)" -- init --apply ischemist/dotfiles
+chezmoi cd
+./scripts/bootstrap
+chezmoi apply
 ```
 
 ## shell layout
@@ -121,6 +124,23 @@ workspaces = true
 ```
 
 this means ordinary searches are global, but up-arrow prefers commands from the current git workspace. old imported zsh history may have `cwd=unknown`, so workspace mode becomes most useful for commands recorded after atuin was installed.
+
+sync:
+
+```sh
+atuin register -u "$USER"
+atuin key
+atuin sync
+```
+
+on the next machine:
+
+```sh
+atuin login -u "$USER" -k "<atuin encryption key>"
+atuin sync
+```
+
+the atuin encryption key is the thing to store in 1password. without it, the server has encrypted history it cannot read and the new machine cannot decrypt.
 
 `per-directory-history` is intentionally not used. atuin already has directory/workspace/session/global filters, and the old zsh plugin conflicts with atuin recording.
 
